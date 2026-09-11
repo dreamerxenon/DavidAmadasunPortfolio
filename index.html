@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dream — Unity Developer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #faf9f6;
+    --surface: #ffffff;
+    --line: #e9e6de;
+    --ink: #16181d;
+    --muted: #6b7076;
+    --accent: #4f46e5;
+    --accent-soft: #eef0ff;
+    --ok-soft: #eaf6ee;
+    --ok: #2f8f4e;
+    --radius-lg: 20px;
+    --radius-md: 12px;
+    --sans: 'Inter', system-ui, sans-serif;
+    --display: 'Sora', system-ui, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;}
+  img{max-width:100%; display:block;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:.001ms !important; transition-duration:.001ms !important;}
+  }
+  :focus-visible{outline:2px solid var(--accent); outline-offset:3px;}
+
+  .wrap{max-width:1040px; margin:0 auto; padding:0 28px;}
+
+  /* NAV */
+  header.nav{
+    position:sticky; top:0; z-index:50;
+    background:rgba(250,249,246,0.9);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{
+    max-width:1040px; margin:0 auto; padding:20px 28px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .nav-name{font-family:var(--display); font-weight:700; font-size:17px; text-decoration:none;}
+  .nav-links{display:flex; gap:28px; list-style:none; margin:0; padding:0;}
+  .nav-links a{text-decoration:none; color:var(--muted); font-size:14.5px; font-weight:500; transition:color .15s ease;}
+  .nav-links a:hover, .nav-links a.active{color:var(--ink);}
+  .nav-toggle{display:none;}
+
+  /* HERO */
+  .hero{padding:88px 0 72px;}
+  .hero-grid{display:grid; grid-template-columns:1.3fr 0.8fr; gap:56px; align-items:center;}
+  .eyebrow-free{color:var(--accent); font-weight:600; font-size:14.5px; margin:0 0 18px;}
+  .hero h1{
+    font-family:var(--display);
+    font-size:clamp(36px, 4.6vw, 54px);
+    line-height:1.08;
+    margin:0 0 20px;
+    font-weight:700;
+    letter-spacing:-0.01em;
+  }
+  .hero p.sub{color:var(--muted); font-size:17.5px; max-width:52ch; margin:0 0 34px;}
+  .hero-actions{display:flex; gap:14px; flex-wrap:wrap;}
+
+  .btn{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:13px 24px; border-radius:100px;
+    font-weight:600; font-size:14.5px; text-decoration:none; cursor:pointer;
+    border:1px solid transparent; transition:transform .12s ease, background .15s ease, border-color .15s ease;
+  }
+  .btn:active{transform:translateY(1px);}
+  .btn-primary{background:var(--ink); color:#fff;}
+  .btn-primary:hover{background:#000;}
+  .btn-ghost{background:transparent; border-color:var(--line); color:var(--ink);}
+  .btn-ghost:hover{border-color:var(--ink);}
+
+  .hero-photo{
+    aspect-ratio: 4/5;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(160deg, var(--accent-soft), #f3ecff);
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+    overflow:hidden;
+    border:1px solid var(--line);
+  }
+  .hero-photo img{width:100%; height:100%; object-fit:cover; position:absolute; inset:0;}
+  .hero-photo .fallback{
+    text-align:center; padding:24px; color:var(--accent);
+    font-family:var(--display); font-weight:600; font-size:15px;
+  }
+  .hero-photo .fallback span{display:block; color:var(--muted); font-family:var(--sans); font-weight:400; font-size:13px; margin-top:6px;}
+
+  /* SECTION SHELL */
+  section{padding:64px 0;}
+  .section-head{margin-bottom:36px;}
+  .section-head .kicker{color:var(--accent); font-weight:600; font-size:14px; margin:0 0 8px;}
+  .section-head h2{font-family:var(--display); font-size:30px; margin:0; font-weight:700;}
+  .section-head p{color:var(--muted); margin:10px 0 0; max-width:56ch;}
+
+  /* PROJECTS */
+  .project-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius-lg);
+    margin-bottom:24px;
+    overflow:hidden;
+  }
+  .project-media{
+    aspect-ratio: 16/8;
+    position:relative;
+    background:#f1efe9;
+  }
+  .project-media img{width:100%; height:100%; object-fit:cover; position:absolute; inset:0;}
+  .project-media .placeholder{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:6px;
+  }
+  .project-media .placeholder strong{font-family:var(--display); font-size:15px; color:var(--muted);}
+  .project-media .placeholder span{font-size:12.5px; color:#9aa0a6;}
+  .media-1 .placeholder{background:linear-gradient(135deg,#fde3e0,#f7c9c9);}
+  .media-2 .placeholder{background:linear-gradient(135deg,#dff5e8,#c7ecd7);}
+  .media-3 .placeholder{background:linear-gradient(135deg,#e4e6fb,#cfd3f7);}
+
+  .project-content{padding:28px 30px 30px;}
+  .project-top{display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap;}
+  .project-title{font-family:var(--display); font-size:22px; font-weight:700; margin:0 0 8px;}
+  .status-pill{
+    font-size:12px; font-weight:600; padding:5px 12px; border-radius:100px;
+    background:var(--ok-soft); color:var(--ok); white-space:nowrap;
+  }
+  .status-pill.wip{background:var(--accent-soft); color:var(--accent);}
+  .project-desc{color:var(--muted); font-size:15px; margin:0 0 18px; max-width:60ch;}
+
+  .tag-row{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px;}
+  .tag{
+    font-size:12.5px; font-weight:500; color:var(--muted);
+    background:var(--bg); border:1px solid var(--line);
+    padding:5px 12px; border-radius:100px;
+  }
+
+  .process-toggle{
+    margin-top:18px;
+    background:none; border:none; padding:0;
+    color:var(--accent); font-weight:600; font-size:14.5px; cursor:pointer;
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .process-toggle .chev{transition:transform .2s ease; font-size:12px;}
+  .project-card.open .process-toggle .chev{transform:rotate(90deg);}
+
+  .process-body{max-height:0; overflow:hidden; transition:max-height .3s ease;}
+  .process-inner{padding-top:22px; margin-top:22px; border-top:1px solid var(--line);}
+
+  .log{list-style:none; margin:0; padding:0;}
+  .log li{display:grid; grid-template-columns:28px 1fr; gap:14px; padding:12px 0;}
+  .log-index{font-family:var(--display); font-weight:700; font-size:13px; color:var(--accent); padding-top:2px;}
+  .log-entry p{margin:0; font-size:14.5px; color:var(--ink);}
+  .log-entry code{
+    font-size:12.5px; background:var(--bg); border:1px solid var(--line);
+    padding:1px 6px; border-radius:4px; color:var(--accent);
+  }
+
+  .wip-note{
+    font-size:14.5px; color:var(--muted); background:var(--bg);
+    border:1px dashed var(--line); border-radius:var(--radius-md);
+    padding:18px 20px; margin-top:4px;
+  }
+
+  /* PROJECT LINKS */
+  .project-links{margin:2px 0 18px; display:flex; gap:10px; flex-wrap:wrap;}
+  .btn-play{padding:10px 20px; font-size:13.5px;}
+  .btn-play.disabled{opacity:.5; pointer-events:none;}
+
+  /* DEVLOG NARRATIVE SECTIONS */
+  .devlog-intro{font-size:14.5px; color:var(--muted); margin:0 0 24px; max-width:64ch;}
+  .devlog-section{margin-bottom:24px;}
+  .devlog-section:last-of-type{margin-bottom:0;}
+  .devlog-section h4{
+    font-family:var(--display); font-size:15px; font-weight:700;
+    margin:0 0 10px; color:var(--ink);
+  }
+  .devlog-section p{margin:0 0 10px; font-size:14.5px; color:var(--ink);}
+  .devlog-section p:last-child{margin-bottom:0;}
+  .devlog-section ul{margin:0 0 10px; padding-left:18px;}
+  .devlog-section ul:last-child{margin-bottom:0;}
+  .devlog-section li{font-size:14.5px; color:var(--ink); margin-bottom:7px;}
+  .devlog-section li:last-child{margin-bottom:0;}
+  .devlog-section code{
+    font-size:12.5px; background:var(--bg); border:1px solid var(--line);
+    padding:1px 6px; border-radius:4px; color:var(--accent);
+  }
+  .devlog-table{width:100%; border-collapse:collapse; font-size:13.5px; margin:4px 0 12px;}
+  .devlog-table th, .devlog-table td{border:1px solid var(--line); padding:8px 10px; text-align:left;}
+  .devlog-table th{background:var(--bg); font-family:var(--display); font-weight:600; font-size:12.5px;}
+
+  /* DEVLOG GALLERY */
+  .devlog-gallery-label{
+    font-family:var(--display); font-weight:600; font-size:13px;
+    color:var(--muted); text-transform:uppercase; letter-spacing:.04em;
+    margin:24px 0 12px;
+  }
+  .devlog-gallery{display:grid; grid-template-columns:repeat(3, 1fr); gap:10px;}
+  .devlog-gallery.single{grid-template-columns:minmax(140px, 220px);}
+  .devlog-gallery .shot{
+    aspect-ratio:4/3; border-radius:10px; overflow:hidden; position:relative;
+    background:#f1efe9; border:1px solid var(--line);
+  }
+  .devlog-gallery .shot img{width:100%; height:100%; object-fit:cover; position:absolute; inset:0;}
+  .devlog-gallery .shot .ph{
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:4px; text-align:center; padding:8px;
+  }
+  .devlog-gallery .shot .ph strong{font-family:var(--sans); font-weight:500; font-size:12px; color:var(--muted);}
+  .devlog-gallery .shot .ph span{font-size:10.5px; color:#9aa0a6;}
+  @media (max-width:480px){
+    .devlog-gallery{grid-template-columns:repeat(2, 1fr);}
+  }
+
+  /* SKILLS */
+  .skills-wrap{display:flex; flex-wrap:wrap; gap:10px;}
+  .skill-pill{
+    background:var(--surface); border:1px solid var(--line); border-radius:100px;
+    padding:10px 18px; font-size:14px; font-weight:500;
+  }
+
+  /* CONTACT */
+  .contact-box{
+    background:var(--ink); color:#fff;
+    border-radius:var(--radius-lg);
+    padding:48px;
+    display:flex; align-items:center; justify-content:space-between; gap:32px; flex-wrap:wrap;
+  }
+  .contact-box h2{font-family:var(--display); font-size:26px; margin:0 0 10px;}
+  .contact-box p{color:#c7c9d1; margin:0; max-width:42ch;}
+  .contact-actions{display:flex; gap:12px; flex-wrap:wrap;}
+  .contact-box .btn-primary{background:#fff; color:var(--ink);}
+  .contact-box .btn-primary:hover{background:#f0f0f0;}
+  .contact-box .btn-ghost{border-color:#3a3d47; color:#fff;}
+  .contact-box .btn-ghost:hover{border-color:#fff;}
+
+  footer{
+    border-top:1px solid var(--line); padding:26px 0 48px;
+    font-size:13px; color:var(--muted);
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;
+  }
+
+  @media (max-width:760px){
+    .hero-grid{grid-template-columns:1fr;}
+    .hero-photo{max-width:280px; margin:0 auto;}
+  }
+  @media (max-width:620px){
+    .nav-links{
+      position:fixed; top:65px; left:0; right:0; background:var(--bg);
+      border-bottom:1px solid var(--line); flex-direction:column; gap:0;
+      display:none; padding:8px 28px 16px;
+    }
+    .nav-links.show{display:flex;}
+    .nav-links a{padding:12px 0; border-bottom:1px solid var(--line);}
+    .nav-toggle{
+      display:block; background:none; border:1px solid var(--line); color:var(--ink);
+      font-size:13px; font-weight:600; padding:8px 14px; border-radius:100px; cursor:pointer;
+    }
+    .contact-box{flex-direction:column; align-items:flex-start; padding:34px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="nav-name" href="#top">Dream</a>
+    <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks">Menu</button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#work">Work</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero" id="top">
+    <div class="hero-grid">
+      <div>
+        <p class="eyebrow-free">Unity Developer · ComeCode Africa</p>
+        <h1>Games are built in the details most players never see.</h1>
+        <p class="sub">
+          I'm Dream — I build the systems, shaders, and edge-case fixes underneath three
+          in-progress games. This page walks through how each one actually got made.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#work">See the work</a>
+          <a class="btn btn-ghost" href="resume.pdf" download>Download résumé</a>
+        </div>
+      </div>
+      <div class="hero-photo">
+        <img src="profile.jpg" alt="Dream" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback" style="display:flex; flex-direction:column;">
+          Photo
+          <span>add profile.jpg here</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="work">
+    <div class="section-head">
+      <p class="kicker">Selected work</p>
+      <h2>Three games, three different builds</h2>
+      <p>Each card opens into the actual process — the systems built, bugs chased, and decisions made along the way.</p>
+    </div>
+
+    <!-- PHANTOM INDEX -->
+    <article class="project-card" data-project>
+      <div class="project-media media-1">
+        <img src="phantom-index.png" alt="Phantom Index screenshot" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="placeholder" style="display:flex;">
+          <strong>Phantom Index</strong>
+          <span>add phantom-index.png here</span>
+        </div>
+      </div>
+      <div class="project-content">
+        <div class="project-top">
+          <div>
+            <h3 class="project-title">Phantom Index</h3>
+          </div>
+          <span class="status-pill">In development</span>
+        </div>
+        <p class="project-desc">A puzzle-mystery told through folders, files, and a keypad that doesn't forgive typos.</p>
+        <div class="tag-row">
+          <span class="tag">Unity</span>
+          <span class="tag">C#</span>
+          <span class="tag">DOTween</span>
+          <span class="tag">Odin Inspector</span>
+          <span class="tag">WebGL</span>
+        </div>
+        <div class="project-links">
+          <!-- Update this href to your live itch.io / hosted WebGL build -->
+          <a class="btn btn-primary btn-play" href="https://your-username.itch.io/phantom-index" target="_blank" rel="noopener">Play Phantom Index ↗</a>
+        </div>
+        <button class="process-toggle" data-toggle aria-expanded="false">
+          View the build process <span class="chev">▸</span>
+        </button>
+        <div class="process-body">
+          <div class="process-inner">
+
+            <p class="devlog-intro">Phantom Index frames its puzzles as an interface rather than a traditional game board — folders, files, and a locked keypad standing in for a mystery you have to dig through by hand. The build was as much about making a UI feel unfriendly and glitchy on purpose as it was about the puzzle logic underneath.</p>
+
+            <div class="devlog-section">
+              <h4>Concept</h4>
+              <p>The whole experience was designed to feel like using someone else's abandoned computer — a little unfriendly, a little glitchy, and rewarding to players who pay attention to detail rather than brute-force every screen.</p>
+            </div>
+
+            <div class="devlog-section">
+              <h4>Core Architecture</h4>
+              <p>The project is built around a <code>GlobalContext</code> singleton that handles registration across systems, with Odin Inspector driving most of the ScriptableObjects in the project. Level data, node data, and story content all live as designer-editable assets instead of hardcoded values.</p>
+            </div>
+
+            <div class="devlog-section">
+              <h4>The Folder &amp; Node System</h4>
+              <p>The main puzzle structure supports up to five folders and 30 nodes per level. This went through a full refactor pass to fix load ordering, recursive chain solving so a solved node can cascade through dependent nodes, and scroll snapping normalized to a clean 0–1 range so snap behavior stayed consistent regardless of content length.</p>
+            </div>
+
+            <div class="devlog-section">
+              <h4>Files &amp; Stories Screen</h4>
+              <p><code>FileController</code> drives the Files/Stories screen: horizontal scroll views with snap scrolling, dot indicators for position, tap-to-back guards so an accidental tap doesn't kick the player out mid-read, and persisted scroll position so returning to a file resumes where they left off.</p>
+            </div>
+
+            <div class="devlog-section">
+              <h4>The Keypad</h4>
+              <p>The retro keypad is one of the most detail-heavy pieces of UI in the game — DOTween-driven glitch effects, procedural audio feedback, chromatic aberration, scanline overlays, and context-sensitive emoji/color states that react to correct versus incorrect entries. <code>StoryController</code> ties directly into it through a lock/unlock system, so story pages only open once the right code has been entered.</p>
+            </div>
+
+            <div class="devlog-section">
+              <h4>ColdCases Panel</h4>
+              <p>A horizontal, snap-scrolling card carousel — also DOTween-driven — for browsing case files. Getting it to feel right took a few passes on drag forwarding, layout timing, and snap position normalization so cards settled cleanly instead of overshooting.</p>
+            </div>
+
+            <div class="devlog-section">
+              <h4>NodeView: The Pill UI</h4>
+              <p>One of the trickier UI problems was the word-pair "pill" labels used throughout NodeView. Pills use 9-slice sprites and needed to resize based on actual rendered text width — solved with world-corner-based width measurement, a <code>_maxPillWidth</code> hard cap with a TextMeshPro auto-sizing fallback for anything that would overflow, and a one-frame deferred refit coroutine so labels never visibly popped after a text change.</p>
+            </div>
+
+            <div class="devlog-section">
+              <h4>Bug: Stale Text Animations</h4>
+              <p><code>EasyTextEffect</code> had a bug where stale character counts left text animations incomplete on level completion — the effect thought it had already finished animating characters that hadn't actually been revealed yet. Fixed by resetting the counter alongside the animation state instead of assuming the two would always stay in sync.</p>
+            </div>
+
+            <div class="devlog-section">
+              <h4>Shipping to WebGL</h4>
+              <p>Getting Phantom Index onto itch.io surfaced a run of WebGL-specific problems:</p>
+              <ul>
+                <li><strong>Save data vanishing between sessions</strong> — traced to <code>Application.persistentDataPath</code> writing into MEMFS, which never synced back to IndexedDB. A jslib + <code>FS.syncfs()</code> approach was tried first; the simpler, more reliable fix was switching to <code>PlayerPrefs</code>, which Unity guarantees is mounted before <code>Start()</code> runs.</li>
+                <li><strong>WASM out-of-memory crashes and URP shader stripping</strong> — required trimming what shipped in the build and being more deliberate about which shader variants URP was allowed to strip.</li>
+                <li><strong>Large file download failures on itch.io's CDN</strong> — some build files were too large for reliable delivery through itch.io's own hosting.</li>
+                <li><strong>Unity 6 macro naming changes and a canvas search-ordering bug</strong> in <code>KeyboardClickEffect.cs</code> that only showed up once deployed to WebGL, not in editor testing.</li>
+                <li><strong>Cross-deploy save loss</strong> — eventually traced to itch.io's hashed CDN paths changing on every new deploy, orphaning browser storage tied to the old path. The fix was moving the live build to a stable hosting URL, with itch.io kept as a redirect rather than the primary host.</li>
+              </ul>
+            </div>
+
+            <div class="devlog-section">
+              <h4>Reflections</h4>
+              <p>Most of Phantom Index's difficulty wasn't the puzzle logic — it was making browser-based persistence and WebGL's stricter runtime behave as predictably as a native build. The lesson that stuck: never trust editor testing alone once WebGL-specific storage and memory behavior is involved.</p>
+            </div>
+
+            <p class="devlog-gallery-label">More from the build</p>
+            <div class="devlog-gallery">
+              <div class="shot">
+                <img src="phantom-index-keypad.png" alt="Phantom Index keypad UI" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="ph" style="display:flex;"><strong>Keypad UI</strong><span>add phantom-index-keypad.png</span></div>
+              </div>
+              <div class="shot">
+                <img src="phantom-index-folders.png" alt="Phantom Index folder system" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="ph" style="display:flex;"><strong>Folder system</strong><span>add phantom-index-folders.png</span></div>
+              </div>
+              <div class="shot">
+                <img src="phantom-index-coldcases.png" alt="Phantom Index ColdCases panel" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="ph" style="display:flex;"><strong>ColdCases panel</strong><span>add phantom-index-coldcases.png</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- TAPPY GREENS -->
+    <article class="project-card" data-project>
+      <div class="project-media media-2">
+        <img src="tappy-greens.png" alt="Tappy Greens screenshot" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="placeholder" style="display:flex;">
+          <strong>Tappy Greens</strong>
+          <span>add tappy-greens.png here</span>
+        </div>
+      </div>
+      <div class="project-content">
+        <div class="project-top">
+          <div>
+            <h3 class="project-title">Tappy Greens</h3>
+          </div>
+          <span class="status-pill">In development</span>
+        </div>
+        <p class="project-desc">A mobile mini golf game built around feel — wind, weight, and the wobble of a well-timed hit.</p>
+        <div class="tag-row">
+          <span class="tag">Unity</span>
+          <span class="tag">URP</span>
+          <span class="tag">Shader Graph</span>
+          <span class="tag">VFX</span>
+          <span class="tag">Unity Gaming Services</span>
+          <span class="tag">Cloud Code</span>
+        </div>
+        <div class="project-links">
+          <!-- Update this href to your Play Store listing (or a downloadable APK / TestFlight link) -->
+          <a class="btn btn-primary btn-play" href="https://play.google.com/store/apps/details?id=com.yourstudio.tappygreens" target="_blank" rel="noopener">Play Tappy Greens ↗</a>
+        </div>
+        <button class="process-toggle" data-toggle aria-expanded="false">
+          View the build process <span class="chev">▸</span>
+        </button>
+        <div class="process-body">
+          <div class="process-inner">
+
+            <p class="devlog-intro">A mobile mini golf game built around feel — quick, tappable sessions, a playful cartoon aesthetic, and a fair amount of engineering hiding underneath the swing.</p>
+
+            <div class="devlog-section">
+              <h4>Concept</h4>
+              <p>Tappy Greens started as a mobile mini golf game — quick, tappable sessions with a cartoon aesthetic rather than a realistic golf sim. The goal was to keep the visual language playful and readable at a glance: vibrant courses, snappy feedback, and mechanics that feel good on a phone screen with one thumb.</p>
+            </div>
+
+            <div class="devlog-section">
+              <h4>Visual Feel: VFX and Environment</h4>
+              <p>A big part of establishing the game's identity came from environmental effects rather than the core swing mechanic itself:</p>
+              <ul>
+                <li><strong>Lightning trail VFX</strong> — integrated using Vefects to give certain shots or moments a bit of visual flair and energy.</li>
+                <li><strong>Wind-reactive grass</strong> — built with the URP Dynamic Grass shader, so the environment feels alive even when the ball isn't moving. Small touches like grass swaying in the wind go a long way toward making static courses feel dynamic.</li>
+                <li><strong>Shattering box obstacles</strong> — destructible elements on courses that reward experimentation and give hazards a satisfying payoff when hit.</li>
+              </ul>
+            </div>
+
+            <div class="devlog-section">
+              <h4>Camera and Feel</h4>
+              <p>Camera work went through iteration to get the right sense of impact. Camera shake was implemented via coroutine-driven positional offsets, applied after the <code>LateUpdate</code> follow logic — this ordering mattered to avoid the shake fighting with or being overwritten by the camera's normal tracking behavior.</p>
+            </div>
+
+            <div class="devlog-section">
+              <h4>Cross-Platform Development Snags</h4>
+              <p>Building for mobile while iterating in the Unity Editor surfaced a few practical development problems:</p>
+              <ul>
+                <li><strong>Editor input handling</strong> — needed alternative mouse input paths for testing in-editor, handled with preprocessor directives to separate editor-only code from the mobile build. This mattered more than usual working off a trackpad rather than a mouse.</li>
+                <li><strong>Render pipeline mismatch</strong> — diagnosed a bug where visuals broke because parts of the project were mixing Built-in Render Pipeline and URP assumptions. Isolating and fixing this was necessary before VFX and shaders would behave consistently across builds.</li>
+              </ul>
+            </div>
+
+            <div class="devlog-section">
+              <h4>Character Selection: Design Iteration</h4>
+              <p>The character selection screen went through a deliberate redesign process:</p>
+              <ul>
+                <li>Landed on vector/cartoon-style avatars to match the game's overall tone, rather than more realistic character art.</li>
+                <li>Adopted a vertical scroll layout for browsing characters, which fit mobile screens better than a horizontal carousel.</li>
+                <li>Backed the system with a <code>CharacterData</code> ScriptableObject, letting each character's data — art, stats, unlock state — live as a reusable, designer-friendly asset rather than being hardcoded.</li>
+              </ul>
+            </div>
+
+            <div class="devlog-section">
+              <h4>Related Course Work (36-Scene Build)</h4>
+              <p>Alongside Tappy Greens' core systems, work on a related mini golf build with 36 scenes involved cleaning up several gameplay bugs and systems:</p>
+              <ul>
+                <li>Fixed animation conflicts between <code>ButtonAnimator</code> and <code>ButtonPopIn</code> fighting over the same UI elements.</li>
+                <li>Solved car spawner randomization so obstacles/props didn't spawn in repetitive or predictable patterns.</li>
+                <li>Refactored star tracking from an ad-hoc setup into a clean per-level indexed array, making it far easier to track and persist star ratings across many levels.</li>
+              </ul>
+            </div>
+
+            <div class="devlog-section">
+              <h4>Backend: Unity Gaming Services &amp; Daily Rewards</h4>
+              <p>Tappy Greens runs a server-authoritative daily reward system built on Unity Gaming Services Cloud Code — <code>DailyScheduler.js</code>, <code>GetDailyFreeWorld.js</code>, and <code>ClaimDailyReward.js</code> — so reward state lives on the server rather than something a player could fake by changing their device clock. A <code>UGSInitializer</code> with two-tier readiness (<code>IsAuthReady</code> / <code>IsFullyReady</code>) and <code>DontDestroyOnLoad</code> singletons for the core managers made sure no scene tried to touch Cloud Save or Leaderboards before auth had actually finished. A reset lock window around UTC midnight closed off the edge case where a claim request landing right at rollover could double-claim.</p>
+              <p>Getting UGS integration solid took a run of genuinely subtle bug fixes:</p>
+              <ul>
+                <li>A Cloud Save SDK key-filtering bug that silently wrapped objects instead of returning them directly.</li>
+                <li>A misidentified <code>LeaderboardVersion</code> field that was being read as something it wasn't.</li>
+                <li>0-indexed rank handling that had been assumed 1-indexed in a couple of places.</li>
+                <li><code>Task.WhenAll</code> quietly dropping successful results when one task in the batch failed.</li>
+                <li>A <code>PlayerPrefs.DeleteAll()</code> call — meant to reset local test data — that was also wiping the cached Auth session token, forcing an unintended re-authentication.</li>
+              </ul>
+            </div>
+
+            <div class="devlog-section">
+              <h4>Monetization: Ads</h4>
+              <p>Ad monetization started on AdMob but hit Android cold-start race conditions that were hard to reproduce reliably. The fix was switching to Unity LevelPlay, with a drop-in <code>AdsManager.cs</code> written to preserve the existing public API so nothing calling into ads elsewhere in the codebase needed to change. That migration still needed its own debugging pass — a <code>LevelPlayBannerAd</code> constructor error, 509 no-fill errors while platform approval was pending, and a rewarded-ad load race condition fixed with an <code>isRewardedLoading</code> guard.</p>
+            </div>
+
+            <div class="devlog-section">
+              <h4>Camera Systems: Deeper Debugging</h4>
+              <p>Beyond the initial camera shake work, <code>CameraController</code> and <code>WorldCameraController</code> went through several more debugging passes: <code>ballClicked</code> never clearing after a weak putt, a Slerp rotation running outside its intended input gate, and double-taps on the Shoot button accidentally triggering <code>SwitchCamera()</code>. Switching camera views also revealed a follow-drift bug, fixed by saving only height and rotation angles (<code>savedMainCamHeight</code>, <code>savedMainCamHorizontalRotation</code>, <code>savedMainCamVerticalRotation</code>) and recomputing position relative to the ball each time, instead of caching a raw position that went stale.</p>
+            </div>
+
+            <div class="devlog-section">
+              <h4>Performance on Budget Android Hardware</h4>
+              <p>Profiling on a budget Android device with a Mali GPU surfaced a clear bottleneck list, worked down one item at a time: per-frame <code>FindFirstObjectByType</code> calls in <code>HeartUI</code> removed, stacked TMP outline objects consolidated, grass instance counts thinned (the single biggest GPU cost), the correct <code>Mobile_RPAsset</code> swapped in, cars pooled with a <code>Dictionary&lt;Queue&gt;</code> pattern instead of instantiate/destroy, and textures moved to ASTC compression.</p>
+            </div>
+
+            <div class="devlog-section">
+              <h4>Audio: The SoundManager</h4>
+              <p>The SoundManager shuffles tracks with gaps rather than looping predictably, and includes a radio "tune-in" effect — a low-pass filter sweep combined with a volume fade — for a bit of texture between tracks. Volume is backed by <code>PlayerPrefs</code> with a polling coroutine, and <code>lastPlayed</code> initialization was randomized to kill a bias where the same track always played first on a fresh launch.</p>
+            </div>
+
+            <div class="devlog-section">
+              <h4>UI Assets: Sprite Slicing</h4>
+              <p>UI sprite sheets — coins, gems, buttons, banners — were sliced in Unity's Sprite Editor using Automatic slicing, which handled the irregularly sized elements better than a fixed grid would have.</p>
+            </div>
+
+            <div class="devlog-section">
+              <h4>Reflections</h4>
+              <p>Most of the creative work here wasn't in a single big feature — it was in the accumulation of small, tactile details (grass motion, shatter effects, camera punch) combined with unglamorous but essential engineering work (render pipeline consistency, data-driven character systems, per-level state tracking, and a server-authoritative backend) that let the game scale to dozens of levels without falling apart.</p>
+            </div>
+
+            <p class="devlog-gallery-label">More from the build</p>
+            <div class="devlog-gallery">
+              <div class="shot">
+                <img src="tappy-greens-grass.png" alt="Tappy Greens wind-reactive grass" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="ph" style="display:flex;"><strong>Wind-reactive grass</strong><span>add tappy-greens-grass.png</span></div>
+              </div>
+              <div class="shot">
+                <img src="tappy-greens-characters.png" alt="Tappy Greens character select" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="ph" style="display:flex;"><strong>Character select</strong><span>add tappy-greens-characters.png</span></div>
+              </div>
+              <div class="shot">
+                <img src="tappy-greens-rewards.png" alt="Tappy Greens daily reward UI" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="ph" style="display:flex;"><strong>Daily reward UI</strong><span>add tappy-greens-rewards.png</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- BOARDBLAST -->
+    <article class="project-card" data-project>
+      <div class="project-media media-3">
+        <img src="boardblast.png" alt="BoardBlast icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="placeholder" style="display:flex;">
+          <strong>BoardBlast</strong>
+          <span>add boardblast.png here</span>
+        </div>
+      </div>
+      <div class="project-content">
+        <div class="project-top">
+          <div>
+            <h3 class="project-title">BoardBlast</h3>
+          </div>
+          <span class="status-pill wip">Early build</span>
+        </div>
+        <p class="project-desc">A real-time 1v1 multiplayer court game built on SpacetimeDB — a database that doubles as the game server.</p>
+        <div class="tag-row">
+          <span class="tag">Unity</span>
+          <span class="tag">SpacetimeDB</span>
+        </div>
+        <div class="project-links">
+          <span class="btn btn-ghost btn-play disabled">In progress — not yet playable</span>
+        </div>
+        <button class="process-toggle" data-toggle aria-expanded="false">
+          View the build process <span class="chev">▸</span>
+        </button>
+        <div class="process-body">
+          <div class="process-inner">
+
+            <p class="devlog-intro">This project started with a simple question: what would it take to build a real Unity multiplayer game using SpacetimeDB, a database that doubles as your game server? The plan was to research the tool, work through the official Unity tutorial (Blackholio, an agar.io-style clone), and then use everything learned there to build something original from scratch.</p>
+
+            <div class="devlog-section">
+              <h4>The Starting Point</h4>
+              <p>The appeal of SpacetimeDB was architectural: no separate game server, no separate database, no manual networking layer. Tables <em>are</em> your persisted world state. Reducers — transactional, identity-authenticated functions — are the only doors into changing that state, whether triggered by a player action or by the clock itself via scheduled tables. Once that mental model clicked from the Blackholio tutorial, the natural next step was to design a game around it from the ground up.</p>
+            </div>
+
+            <div class="devlog-section">
+              <h4>Concept: BoardBlast</h4>
+              <p>The idea: a 1v1 real-time court game. Two players face off with paddles at opposite ends of a rectangular court. A ball starts in the center and moves toward one end or the other. Each player slides their board horizontally to keep the ball from passing their own end. Let it through, and the opponent scores. First to 3 points wins the match.</p>
+              <p>The game went through a few rounds of rule clarification before landing on its final shape:</p>
+              <ul>
+                <li><strong>Early version</strong> — a fixed 3-round structure with round-based speed scaling.</li>
+                <li><strong>Revised</strong> — rounds became rallies: winning a rally scores a point, first to 3 points wins the match, no fixed round count.</li>
+                <li><strong>Final ball-speed rule</strong> — every rally starts at the same base speed, then accelerates continuously the longer the rally goes on, creating a natural tension curve within each point rather than an artificial round-to-round difficulty ramp.</li>
+              </ul>
+              <p>The game was originally sketched in 2D, then converted to a full 3D environment partway through — which meant redesigning the coordinate system (X/Z court plane instead of X/Y), replacing the tutorial's <code>DbVector2</code> with a custom <code>DbVector3</code> type (SpacetimeDB has no built-in vector types — both are just structs you define yourself with <code>[SpacetimeDB.Type]</code>), and rethinking camera framing for a 3D arena instead of a flat top-down view.</p>
+            </div>
+
+            <div class="devlog-section">
+              <h4>Core Architecture</h4>
+              <p>The server module ended up organized around a few key table groups:</p>
+              <ul>
+                <li><strong>Identity &amp; progression</strong> — <code>Player</code>, <code>DivisionRuleRow</code>, <code>PaddleType</code>, <code>OwnedPaddle</code>, <code>EquippedPaddle</code></li>
+                <li><strong>Matchmaking</strong> — <code>MatchmakingQueue</code></li>
+                <li><strong>Live match state</strong> — <code>CourtConfig</code>, <code>Match</code>, <code>Board</code>, <code>Ball</code></li>
+                <li><strong>Timing</strong> — <code>GameTickTimer</code>, <code>RoundCountdown</code>, <code>CountdownTickTimer</code>, <code>PreMatchTimer</code></li>
+                <li><strong>"Flash" events</strong> — <code>PaddleHitEvent</code>, <code>RoundWinEvent</code>, single-row-per-match tables overwritten every time something visually notable happens, purely so the client has something to react to</li>
+              </ul>
+              <p>That last category turned out to be one of the more elegant patterns in the whole build. Rather than inventing a separate networking channel for "hey, play a particle effect here," a paddle hit or a round-winning shot simply overwrites a tiny table row with a position. The client subscribes, reacts to the insert, and picks a random particle prefab to play at that exact server-authoritative position — no extra protocol needed, just the same subscribe/react model used for everything else.</p>
+            </div>
+
+            <div class="devlog-section">
+              <h4>The Match Lifecycle</h4>
+              <p>A match moves through distinct phases, each with its own scheduled reducer driving it forward:</p>
+              <ul>
+                <li><strong>Matchmaking</strong> — <code>JoinQueue</code> scans for another queued player in the same division (divisions are strictly separated — no matching outside your tier). Instant matching, no polling delay, since the check happens the moment someone joins.</li>
+                <li><strong>PreMatch</strong> — once paired, a 4-second window shows both players' profiles side by side (avatar, username, rank points) before anything moves. This phase was added specifically to give the "VS screen" moment its own beat, and required extending <code>MatchState</code> with a distinct <code>PreMatch</code> value.</li>
+                <li><strong>Round countdown</strong> — a 3-second on-screen countdown plays before the ball spawns, both at match start and after every point scored. A particle effect plays before this countdown too, but only when a round was actually won, distinguished client-side by checking whether the match's score is still 0-0.</li>
+                <li><strong>GameTick</strong> — the actual physics loop, running at 20 ticks/second via a scheduled reducer: ball movement, wall bounces, paddle collision with angle-based deflection, and boundary crossing detection for scoring.</li>
+                <li><strong>Match end</strong> — win, loss, ranking point adjustments, coin rewards, promotion/demotion checks, and full cleanup of every timer and transient row tied to that match.</li>
+              </ul>
+            </div>
+
+            <div class="devlog-section">
+              <h4>Ranking: The Five-Division System</h4>
+              <p>Progression was designed as five divisions, each with its own win/loss point ranges and its own promotion threshold — explicitly modeled as data (<code>DivisionRuleRow</code>) rather than hardcoded branching logic, so balance changes are a SQL update, not a redeploy:</p>
+              <table class="devlog-table">
+                <thead>
+                  <tr><th>Division</th><th>Promotes at</th><th>Win points</th><th>Loss points</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>1</td><td>1300</td><td>30–35</td><td>10–15</td></tr>
+                  <tr><td>2</td><td>1500</td><td>30–35</td><td>10–15</td></tr>
+                  <tr><td>3</td><td>1700</td><td>20</td><td>10–15</td></tr>
+                  <tr><td>4</td><td>2000</td><td>15</td><td>10–15</td></tr>
+                  <tr><td>5</td><td>— (top tier)</td><td>10</td><td>10–15</td></tr>
+                </tbody>
+              </table>
+              <p>Demotion was added symmetrically later — falling back below the exact score that promoted you into your current division drops you back one tier, with division 1 acting as a floor.</p>
+              <p>A disconnect mid-match doesn't let you dodge the consequence either: the server detects an active match tied to the disconnecting player's identity and awards the win to whoever remained, running through the exact same ranking/coin logic as a natural match conclusion.</p>
+            </div>
+
+            <div class="devlog-section">
+              <h4>The Economy: Coins and Paddles</h4>
+              <p>Winning matches pays out coins, spendable in a paddle shop offering boards of increasing length — a small progression loop layered on top of the ranking system. Paddle length isn't just cosmetic: it's read server-side at match creation and directly affects the actual collision boundary in <code>GameTick</code>, so a purchased upgrade has real gameplay weight, not just a visual difference.</p>
+            </div>
+
+            <div class="devlog-section">
+              <h4>Identity: Avatars and the VS Screen</h4>
+              <p>Every new player is randomly assigned one of ten avatars at registration. That single <code>avatar_id</code> integer flows everywhere identity needs to show up — the in-match scoreboard, the pre-match VS screen, the player's own profile panel — all resolved client-side through one shared lookup utility mapping the number to the correct image asset.</p>
+            </div>
+
+            <div class="devlog-section">
+              <h4>Making It Feel Good: Particles, Shake, and Motion</h4>
+              <p>Once the core loop worked, the focus shifted to feedback and feel:</p>
+              <ul>
+                <li><strong>Random hit particles</strong> — a pool of different "impact" text effects, one chosen at random and spawned at the exact server-reported collision point every time the ball connects with a paddle.</li>
+                <li><strong>Random win particles</strong> — a separate pool of fire effects, triggered at the losing end of the court, positioned using the ball's exact crossing point at the moment of scoring.</li>
+                <li><strong>Camera shake</strong> — a lightweight, ease-out positional shake layered onto both of the events above, subtle on a paddle hit, stronger on a round win.</li>
+                <li><strong>UI motion</strong> — the countdown panel and match-over banner both animate in and out with DOTween scale tweens (<code>OutBack</code>/<code>InBack</code> easing) rather than snapping instantly, giving key moments a bit of weight.</li>
+              </ul>
+            </div>
+
+            <div class="devlog-section">
+              <h4>Input: Rethinking Control for Mobile</h4>
+              <p>Keyboard input (<code>Input.GetAxis("Horizontal")</code>) worked fine for early testing but didn't fit the eventual target of a touch-first game. It was replaced with a spring-back UI Slider — drag to move, release and it snaps back to center, functioning like a one-axis joystick. <code>PaddleController</code> reads the slider's current value on the same throttled send-tick it always used, so the underlying networking pattern didn't need to change at all — only where the input number came from.</p>
+            </div>
+
+            <div class="devlog-section">
+              <h4>The Debugging Trail</h4>
+              <p>A project like this accumulates a specific kind of debugging history, and a few of these were genuinely instructive:</p>
+              <ul>
+                <li><strong>Publishing from the wrong folder</strong> — an early and very common mistake: running <code>spacetime publish</code> from inside the Unity project itself picked up Unity's own generated <code>.csproj</code> files instead of the actual server module, causing a cryptic CLI panic. The fix was structural: the server module needs to live in a completely separate folder from the Unity project, never nested inside <code>Assets/</code>.</li>
+                <li><strong>Stale client bindings</strong> — several rounds of "reducer doesn't exist" errors traced back to editing the server module without re-running <code>spacetime generate</code> afterward. Publishing and generating are two separate steps, and skipping the second one silently leaves Unity working against an outdated schema.</li>
+                <li><strong>The <code>player_id</code> vs <code>identity</code> update bug</strong> — <code>Player.player_id</code> is <code>[Unique]</code>, not <code>[PrimaryKey]</code>; only the primary key column supports <code>.Update()</code>. A few reducers called <code>.player_id.Update(...)</code> out of habit, which doesn't compile — a good reminder that <code>Unique</code> and <code>PrimaryKey</code> aren't interchangeable even though both support lookups.</li>
+                <li><strong>The blank-username collision</strong> — the single most subtle bug in the whole project. <code>Player.username</code> was originally marked <code>[Unique]</code>, and every newly connected, not-yet-registered player got inserted with <code>username = ""</code>. Since a unique constraint applies globally, only the first ever unregistered connection could hold that value — every subsequent fresh identity got flatly rejected at the connection layer with "value already exists," even though nothing was actually wrong with their registration. The fix was removing the database-level constraint entirely and relying on the manual uniqueness check already present inside the <code>RegisterPlayer</code> reducer, which only needs to apply to genuinely chosen usernames, not the shared placeholder default.</li>
+                <li><strong>Silent reducer failures</strong> — a recurring lesson: calling a reducer from the C# client SDK is fire-and-forget. A <code>try/catch</code> around the call site catches connection-level failures, but never a server-side rejection (insufficient coins, duplicate username, and so on). The correct pattern is subscribing to that reducer's specific event callback and checking <code>ctx.Event.Status</code> for <code>Committed</code> versus <code>Failed</code>. Several UI scripts were quietly assuming success and updating regardless of what the server actually did, until this was corrected.</li>
+                <li><strong>Court scale mismatches</strong> — the gameplay bounds (<code>CourtConfig.court_width</code>/<code>court_length</code>) and the actual visual arena asset drifted out of sync more than once: walls repositioning to the wrong spot, paddles ending up off the real playing surface, a custom floor mesh getting incorrectly rescaled based on a "default 10-unit plane" assumption that didn't apply to a bespoke asset. The fix each time came back to the same principle — treat the server's court dimensions as the single source of truth for both rendering and physics, and measure the actual asset's real-world bounds rather than guessing.</li>
+              </ul>
+            </div>
+
+            <div class="devlog-section">
+              <h4>Reflections</h4>
+              <ul>
+                <li><strong>Data-driven rules beat hardcoded branches.</strong> The division system, court dimensions, and paddle catalog all live in tables specifically so they can be tuned with a SQL statement instead of a redeploy.</li>
+                <li><strong>Every visual moment worth reacting to can be a table row.</strong> Particles and camera shake didn't need a custom event system — they needed one small, frequently-overwritten table each.</li>
+                <li><strong>Fire-and-forget reducer calls demand explicit result handling.</strong> Assuming success is the single easiest mistake to make when moving from a traditional request/response API mindset into SpacetimeDB's model.</li>
+                <li><strong>Match the server's gameplay math to the client's actual geometry, always.</strong> Any hardcoded assumption about scale, on either side, is a bug waiting to surface the moment the art doesn't match the placeholder.</li>
+              </ul>
+              <p>BoardBlast is still growing — the paddle shop, division ladder, and presentation layer are all in place, with room ahead for deeper progression systems and a real cross-device login bridge once the core game loop is fully proven out.</p>
+            </div>
+
+            <p class="devlog-gallery-label">More from the build</p>
+            <div class="devlog-gallery single">
+              <div class="shot">
+                <img src="boardblast.png" alt="BoardBlast icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="ph" style="display:flex;"><strong>Icon</strong><span>add boardblast.png</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+  </section>
+
+  <section id="skills">
+    <div class="section-head">
+      <p class="kicker">Toolbox</p>
+      <h2>Tools &amp; systems</h2>
+    </div>
+    <div class="skills-wrap">
+      <span class="skill-pill">Unity / C#</span>
+      <span class="skill-pill">DOTween</span>
+      <span class="skill-pill">URP &amp; Shader Graph</span>
+      <span class="skill-pill">Odin Inspector</span>
+      <span class="skill-pill">ScriptableObjects</span>
+      <span class="skill-pill">WebGL / itch.io</span>
+      <span class="skill-pill">SpacetimeDB</span>
+      <span class="skill-pill">Node.js / Express</span>
+      <span class="skill-pill">Web3 integration</span>
+      <span class="skill-pill">Unity Gaming Services</span>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="contact-box">
+      <div>
+        <h2>Let's talk</h2>
+        <p>Grab the résumé for the full history, or send an email directly.</p>
+      </div>
+      <div class="contact-actions">
+        <a class="btn btn-primary" href="mailto:youremail@example.com?subject=Let's%20talk">Send email</a>
+        <a class="btn btn-ghost" href="resume.pdf" download>Download résumé</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  <span>Dream — Unity Developer, ComeCode Africa</span>
+  <span id="year"></span>
+</footer>
+
+<script>
+  document.querySelectorAll('[data-toggle]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var card = btn.closest('[data-project]');
+      var body = card.querySelector('.process-body');
+      var isOpen = card.classList.contains('open');
+      if(isOpen){
+        card.classList.remove('open');
+        body.style.maxHeight = null;
+        btn.setAttribute('aria-expanded','false');
+      } else {
+        card.classList.add('open');
+        body.style.maxHeight = body.scrollHeight + 'px';
+        btn.setAttribute('aria-expanded','true');
+      }
+    });
+  });
+
+  var navToggle = document.getElementById('navToggle');
+  var navLinks = document.getElementById('navLinks');
+  if(navToggle){
+    navToggle.addEventListener('click', function(){
+      var shown = navLinks.classList.toggle('show');
+      navToggle.setAttribute('aria-expanded', shown ? 'true' : 'false');
+    });
+    navLinks.querySelectorAll('a').forEach(function(a){
+      a.addEventListener('click', function(){
+        navLinks.classList.remove('show');
+        navToggle.setAttribute('aria-expanded','false');
+      });
+    });
+  }
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  (function(){
+    var sections = ['work','skills','contact'].map(function(id){ return document.getElementById(id); });
+    var links = Array.from(document.querySelectorAll('.nav-links a'));
+    if(!('IntersectionObserver' in window)) return;
+    var observer = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          links.forEach(function(l){ l.classList.remove('active'); });
+          var match = links.find(function(l){ return l.getAttribute('href') === '#' + entry.target.id; });
+          if(match) match.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-40% 0px -50% 0px' });
+    sections.forEach(function(s){ if(s) observer.observe(s); });
+  })();
+</script>
+
+</body>
+</html>
