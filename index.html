@@ -110,6 +110,22 @@
   .section-head h2{font-family:var(--display); font-size:30px; margin:0; font-weight:700;}
   .section-head p{color:var(--muted); margin:10px 0 0; max-width:56ch;}
 
+  /* EXPERIENCE */
+  .experience-list{display:flex; flex-direction:column; gap:16px;}
+  .experience-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-md);
+    padding:24px 26px;
+  }
+  .experience-top{display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap;}
+  .experience-role{font-family:var(--display); font-size:17px; font-weight:700; margin:0 0 4px;}
+  .experience-company{margin:0; font-size:14px; color:var(--accent); font-weight:600;}
+  .experience-dates{
+    font-size:12.5px; font-weight:600; color:var(--muted);
+    background:var(--bg); border:1px solid var(--line);
+    padding:5px 12px; border-radius:100px; white-space:nowrap;
+  }
+  .experience-desc{margin:14px 0 0; font-size:14.5px; color:var(--ink); max-width:64ch;}
+
   /* PROJECTS */
   .project-card{
     background:var(--surface);
@@ -134,6 +150,7 @@
   .media-1 .placeholder{background:linear-gradient(135deg,#fde3e0,#f7c9c9);}
   .media-2 .placeholder{background:linear-gradient(135deg,#dff5e8,#c7ecd7);}
   .media-3 .placeholder{background:linear-gradient(135deg,#e4e6fb,#cfd3f7);}
+  .media-4 .placeholder{background:linear-gradient(135deg,#fef3d0,#fbe0a8);}
 
   .project-content{padding:28px 30px 30px;}
   .project-top{display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap;}
@@ -259,7 +276,10 @@
 
   @media (max-width:760px){
     .hero-grid{grid-template-columns:1fr;}
-    .hero-photo{max-width:280px; margin:0 auto;}
+    .hero-photo{width:65%; max-width:340px; margin:0 auto;}
+  }
+  @media (max-width:480px){
+    .hero-photo{width:80%; max-width:none;}
   }
   @media (max-width:620px){
     .nav-links{
@@ -285,6 +305,7 @@
     <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks">Menu</button>
     <ul class="nav-links" id="navLinks">
       <li><a href="#work">Work</a></li>
+      <li><a href="#experience">Experience</a></li>
       <li><a href="#skills">Skills</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
@@ -308,10 +329,10 @@
         </div>
       </div>
       <div class="hero-photo">
-        <img src="profile.jpg" alt="Dream" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <img src="profile.jpg" alt="David" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
         <div class="fallback" style="display:flex; flex-direction:column;">
-          
-          
+          Photo
+          <span>add profile.jpg here</span>
         </div>
       </div>
     </div>
@@ -320,15 +341,14 @@
   <section id="work">
     <div class="section-head">
       <p class="kicker">Selected work</p>
-      <h2>Three games, three different builds</h2>
+      <h2>Four games, four different builds</h2>
       <p>Each card opens into the actual process — the systems built, bugs chased, and decisions made along the way.</p>
     </div>
 
     <!-- PHANTOM INDEX -->
     <article class="project-card" data-project>
       <div class="project-media media-1">
-        <img src="phantom-index.png" alt="Phantom Index screenshot" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-       
+        <img src="phantom-index.png" alt="Phantom Index screenshot" onerror="this.style.display='none';">
       </div>
       <div class="project-content">
         <div class="project-top">
@@ -346,8 +366,7 @@
           <span class="tag">WebGL</span>
         </div>
         <div class="project-links">
-          <!-- Update this href to your live itch.io / hosted WebGL build -->
-          <a class="btn btn-primary btn-play" href="https://mikaelstudios.itch.io/phantom-index" rel="noopener">Play Phantom Index ↗</a>
+          <a class="btn btn-primary btn-play" href="https://mikaelstudios.itch.io/phantom-index" target="_blank" rel="noopener">Play Phantom Index ↗</a>
         </div>
         <button class="process-toggle" data-toggle aria-expanded="false">
           View the build process <span class="chev">▸</span>
@@ -417,16 +436,13 @@
             <p class="devlog-gallery-label">More from the build</p>
             <div class="devlog-gallery">
               <div class="shot">
-                <img src="phantom-index-keypad.png" alt="Phantom Index keypad UI" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-               
+                <img src="phantom-index-keypad.png" alt="Phantom Index keypad UI" onerror="this.style.display='none';">
               </div>
               <div class="shot">
-                <img src="phantom-index-folders.png" alt="Phantom Index folder system" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-               
+                <img src="phantom-index-folders.png" alt="Phantom Index folder system" onerror="this.style.display='none';">
               </div>
               <div class="shot">
-                <img src="phantom-index-coldcases.png" alt="Phantom Index ColdCases panel" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-               
+                <img src="phantom-index-coldcases.png" alt="Phantom Index ColdCases panel" onerror="this.style.display='none';">
               </div>
             </div>
           </div>
@@ -437,8 +453,7 @@
     <!-- TAPPY GREENS -->
     <article class="project-card" data-project>
       <div class="project-media media-2">
-        <img src="tappy-greens.png" alt="Tappy Greens screenshot" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-        
+        <img src="tappy-greens.png" alt="Tappy Greens screenshot" onerror="this.style.display='none';">
       </div>
       <div class="project-content">
         <div class="project-top">
@@ -457,8 +472,7 @@
           <span class="tag">Cloud Code</span>
         </div>
         <div class="project-links">
-          <!-- Update this href to your Play Store listing (or a downloadable APK / TestFlight link) -->
-          <a class="btn btn-primary btn-play" href="" target="_blank" rel="noopener">Play Tappy Greens - early October</a>
+          <span class="btn btn-primary btn-play disabled">Play Tappy Greens — early October</span>
         </div>
         <button class="process-toggle" data-toggle aria-expanded="false">
           View the build process <span class="chev">▸</span>
@@ -563,16 +577,13 @@
             <p class="devlog-gallery-label">More from the build</p>
             <div class="devlog-gallery">
               <div class="shot">
-                <img src="tappy-greens-grass.png" alt="Tappy Greens wind-reactive grass" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-              
+                <img src="tappy-greens-grass.png" alt="Tappy Greens wind-reactive grass" onerror="this.style.display='none';">
               </div>
               <div class="shot">
-                <img src="tappy-greens-characters.png" alt="Tappy Greens character select" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-
+                <img src="tappy-greens-characters.png" alt="Tappy Greens character select" onerror="this.style.display='none';">
               </div>
               <div class="shot">
-                <img src="tappy-greens-rewards.png" alt="Tappy Greens daily reward UI" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-              
+                <img src="tappy-greens-rewards.png" alt="Tappy Greens daily reward UI" onerror="this.style.display='none';">
               </div>
             </div>
           </div>
@@ -583,10 +594,7 @@
     <!-- BOARDBLAST -->
     <article class="project-card" data-project>
       <div class="project-media media-3">
-       <img src="boardblast.png" alt="BoardBlast icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-        
-         
-        </div>
+        <img src="boardblast.png" alt="BoardBlast icon" onerror="this.style.display='none';">
       </div>
       <div class="project-content">
         <div class="project-top">
@@ -722,13 +730,113 @@
               <p>BoardBlast is still growing — the paddle shop, division ladder, and presentation layer are all in place, with room ahead for deeper progression systems and a real cross-device login bridge once the core game loop is fully proven out.</p>
             </div>
 
-            
-            
+            <p class="devlog-gallery-label">More from the build</p>
+            <div class="devlog-gallery single">
+              <div class="shot">
+                <img src="boardblast.png" alt="BoardBlast icon" onerror="this.style.display='none';">
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </article>
 
+    <!-- CATDASH -->
+    <article class="project-card" data-project>
+      <div class="project-media media-1">
+        <img src="catdash.png" alt="CatDash screenshot" onerror="this.style.display='none';">
+      </div>
+      <div class="project-content">
+        <div class="project-top">
+          <div>
+            <h3 class="project-title">CatDash</h3>
+          </div>
+          <span class="status-pill">Published</span>
+        </div>
+        <p class="project-desc">My first game — a 2D endless runner where a cat dashes and leaps over obstacles to beat its own high score.</p>
+        <div class="tag-row">
+          <span class="tag">Unity</span>
+          <span class="tag">C#</span>
+          <span class="tag">2D</span>
+          <span class="tag">Endless Runner</span>
+        </div>
+        <div class="project-links">
+          <!-- Update this href to your live CatDash build -->
+          <a class="btn btn-primary btn-play" href="https://dreamermadeagame.itch.io/catdash" target="_blank" rel="noopener">Play CatDash ↗</a>
+        </div>
+        <button class="process-toggle" data-toggle aria-expanded="false">
+          View the build process <span class="chev">▸</span>
+        </button>
+        <div class="process-body">
+          <div class="process-inner">
+
+            <p class="devlog-intro">Step into the thrilling world of CatDash — an action-packed endless runner where a cat leaps over obstacles, collects coins, and grabs power-ups on the way to a new high score. This was the very first game built from scratch, before any of the systems or workflows behind the other projects existed.</p>
+
+            <div class="devlog-section">
+              <h4>Concept</h4>
+              <p>A 2D endless runner in the vein of Chrome's dino-dash game, but starring a cat. The core loop is simple on purpose: run, time a jump, dodge an obstacle, collect coins and power-ups along the way, and try to beat the previous run's high score.</p>
+            </div>
+
+            <div class="devlog-section">
+              <h4>A First Game, Lightly Documented</h4>
+              <p>CatDash predates the habit of keeping a running devlog, so there isn't a detailed build-by-build history the way the other projects have. What's here is closer to a summary than a log — but it's the project everything else was learned from.</p>
+            </div>
+
+            <div class="devlog-section">
+              <h4>Reflections</h4>
+              <p>Every pattern that shows up more deliberately in the later projects — object pooling, tuning game feel, shipping something a player can actually pick up and beat a score in — started here first, just without the vocabulary yet to name what was being learned.</p>
+            </div>
+
+            <p class="devlog-gallery-label">More from the build</p>
+            <div class="devlog-gallery">
+              <div class="shot">
+                <img src="catdash-gameplay.png" alt="CatDash gameplay" onerror="this.style.display='none';">
+              </div>
+              <div class="shot">
+                <img src="catdash-obstacles.png" alt="CatDash obstacles" onerror="this.style.display='none';">
+              </div>
+              <div class="shot">
+                <img src="catdash-highscore.png" alt="CatDash high score screen" onerror="this.style.display='none';">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+  </section>
+
+  <section id="experience">
+    <div class="section-head">
+      <p class="kicker">Experience</p>
+      <h2>Where I've worked</h2>
+      <p>Internships that took me outside my own projects and into teams shipping games with other people.</p>
+    </div>
+    <div class="experience-list">
+
+      <div class="experience-card">
+        <div class="experience-top">
+          <div>
+            <h3 class="experience-role">Game Development Intern</h3>
+            <p class="experience-company">Leti Arts</p>
+          </div>
+          <span class="experience-dates">Nov 2025 – Jan 2026</span>
+        </div>
+        <p class="experience-desc">Worked alongside a team of designers, artists, and audio artists on African-themed games, contributing across gameplay systems and features as part of the wider team rather than working solo.</p>
+      </div>
+
+      <div class="experience-card">
+        <div class="experience-top">
+          <div>
+            <h3 class="experience-role">Unity Developer Intern</h3>
+            <p class="experience-company">Mikael Studios</p>
+          </div>
+          <span class="experience-dates">May – Jul 2026</span>
+        </div>
+        <p class="experience-desc">Built out Phantom Index end to end — core puzzle systems, UI, and the WebGL release — as part of my time with the studio.</p>
+      </div>
+
+    </div>
   </section>
 
   <section id="skills">
@@ -766,7 +874,7 @@
 </main>
 
 <footer class="wrap">
-  <span>David -  Unity Developer</span>
+  <span>David - Unity Developer</span>
   <span id="year"></span>
 </footer>
 
@@ -806,7 +914,7 @@
   document.getElementById('year').textContent = new Date().getFullYear();
 
   (function(){
-    var sections = ['work','skills','contact'].map(function(id){ return document.getElementById(id); });
+    var sections = ['work','experience','skills','contact'].map(function(id){ return document.getElementById(id); });
     var links = Array.from(document.querySelectorAll('.nav-links a'));
     if(!('IntersectionObserver' in window)) return;
     var observer = new IntersectionObserver(function(entries){
