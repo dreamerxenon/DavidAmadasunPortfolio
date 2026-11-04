@@ -591,7 +591,7 @@
       </div>
     </article>
 
-    <!-- BOARDBLAST -->
+   <!-- BOARDBLAST -->
     <article class="project-card" data-project>
       <div class="project-media media-3">
         <img src="boardblast.png" alt="BoardBlast icon" onerror="this.style.display='none';">
@@ -601,15 +601,20 @@
           <div>
             <h3 class="project-title">BoardBlast</h3>
           </div>
-          <span class="status-pill wip">Early build</span>
+          <span class="status-pill wip">Playable build</span>
         </div>
-        <p class="project-desc">A real-time 1v1 multiplayer court game built on SpacetimeDB — a database that doubles as the game server.</p>
+        <p class="project-desc">A ranked 1v1 multiplayer take on block breaker — Unity client, server-authoritative physics on SpacetimeDB, ten divisions, coin and powerup shops, and cross-device accounts.</p>
         <div class="tag-row">
           <span class="tag">Unity</span>
+          <span class="tag">C#</span>
+          <span class="tag">URP</span>
           <span class="tag">SpacetimeDB</span>
+          <span class="tag">SpacetimeAuth (OIDC)</span>
+          <span class="tag">DOTween</span>
         </div>
         <div class="project-links">
-          <span class="btn btn-ghost btn-play disabled">In progress — not yet playable</span>
+          <!-- Update this href to your live BoardBlast page on itch.io -->
+          <a class="btn btn-primary btn-play" href="https://dreamermadeagame.itch.io/boardblast" target="_blank" rel="noopener">Play BoardBlast on the web ↗</a>
         </div>
         <button class="process-toggle" data-toggle aria-expanded="false">
           View the build process <span class="chev">▸</span>
@@ -617,53 +622,43 @@
         <div class="process-body">
           <div class="process-inner">
 
-            <p class="devlog-intro">This project started with a simple question: what would it take to build a real Unity multiplayer game using SpacetimeDB, a database that doubles as your game server? The plan was to research the tool, work through the official Unity tutorial (Blackholio, an agar.io-style clone), and then use everything learned there to build something original from scratch.</p>
+            <p class="devlog-intro">Block breaker, minus the blocks. I kept the paddle-and-ball mechanics and replaced the wall of blocks with a second player: get the ball past your opponent's end, don't let it past yours, first to 3 points wins. Around that core I built ranked divisions, a coin economy, powerups and cross-device accounts.</p>
 
             <div class="devlog-section">
-              <h4>The Starting Point</h4>
-              <p>The appeal of SpacetimeDB was architectural: no separate game server, no separate database, no manual networking layer. Tables <em>are</em> your persisted world state. Reducers — transactional, identity-authenticated functions — are the only doors into changing that state, whether triggered by a player action or by the clock itself via scheduled tables. Once that mental model clicked from the Blackholio tutorial, the natural next step was to design a game around it from the ground up.</p>
-            </div>
-
-            <div class="devlog-section">
-              <h4>Concept: BoardBlast</h4>
-              <p>The idea: a 1v1 real-time court game. Two players face off with paddles at opposite ends of a rectangular court. A ball starts in the center and moves toward one end or the other. Each player slides their board horizontally to keep the ball from passing their own end. Let it through, and the opponent scores. First to 3 points wins the match.</p>
-              <p>The game went through a few rounds of rule clarification before landing on its final shape:</p>
+              <h4>Project snapshot</h4>
               <ul>
-                <li><strong>Early version</strong> — a fixed 3-round structure with round-based speed scaling.</li>
-                <li><strong>Revised</strong> — rounds became rallies: winning a rally scores a point, first to 3 points wins the match, no fixed round count.</li>
-                <li><strong>Final ball-speed rule</strong> — every rally starts at the same base speed, then accelerates continuously the longer the rally goes on, creating a natural tension curve within each point rather than an artificial round-to-round difficulty ramp.</li>
-              </ul>
-              <p>The game was originally sketched in 2D, then converted to a full 3D environment partway through — which meant redesigning the coordinate system (X/Z court plane instead of X/Y), replacing the tutorial's <code>DbVector2</code> with a custom <code>DbVector3</code> type (SpacetimeDB has no built-in vector types — both are just structs you define yourself with <code>[SpacetimeDB.Type]</code>), and rethinking camera framing for a 3D arena instead of a flat top-down view.</p>
-            </div>
-
-            <div class="devlog-section">
-              <h4>Core Architecture</h4>
-              <p>The server module ended up organized around a few key table groups:</p>
-              <ul>
-                <li><strong>Identity &amp; progression</strong> — <code>Player</code>, <code>DivisionRuleRow</code>, <code>PaddleType</code>, <code>OwnedPaddle</code>, <code>EquippedPaddle</code></li>
-                <li><strong>Matchmaking</strong> — <code>MatchmakingQueue</code></li>
-                <li><strong>Live match state</strong> — <code>CourtConfig</code>, <code>Match</code>, <code>Board</code>, <code>Ball</code></li>
-                <li><strong>Timing</strong> — <code>GameTickTimer</code>, <code>RoundCountdown</code>, <code>CountdownTickTimer</code>, <code>PreMatchTimer</code></li>
-                <li><strong>"Flash" events</strong> — <code>PaddleHitEvent</code>, <code>RoundWinEvent</code>, single-row-per-match tables overwritten every time something visually notable happens, purely so the client has something to react to</li>
-              </ul>
-              <p>That last category turned out to be one of the more elegant patterns in the whole build. Rather than inventing a separate networking channel for "hey, play a particle effect here," a paddle hit or a round-winning shot simply overwrites a tiny table row with a position. The client subscribes, reacts to the insert, and picks a random particle prefab to play at that exact server-authoritative position — no extra protocol needed, just the same subscribe/react model used for everything else.</p>
-            </div>
-
-            <div class="devlog-section">
-              <h4>The Match Lifecycle</h4>
-              <p>A match moves through distinct phases, each with its own scheduled reducer driving it forward:</p>
-              <ul>
-                <li><strong>Matchmaking</strong> — <code>JoinQueue</code> scans for another queued player in the same division (divisions are strictly separated — no matching outside your tier). Instant matching, no polling delay, since the check happens the moment someone joins.</li>
-                <li><strong>PreMatch</strong> — once paired, a 4-second window shows both players' profiles side by side (avatar, username, rank points) before anything moves. This phase was added specifically to give the "VS screen" moment its own beat, and required extending <code>MatchState</code> with a distinct <code>PreMatch</code> value.</li>
-                <li><strong>Round countdown</strong> — a 3-second on-screen countdown plays before the ball spawns, both at match start and after every point scored. A particle effect plays before this countdown too, but only when a round was actually won, distinguished client-side by checking whether the match's score is still 0-0.</li>
-                <li><strong>GameTick</strong> — the actual physics loop, running at 20 ticks/second via a scheduled reducer: ball movement, wall bounces, paddle collision with angle-based deflection, and boundary crossing detection for scoring.</li>
-                <li><strong>Match end</strong> — win, loss, ranking point adjustments, coin rewards, promotion/demotion checks, and full cleanup of every timer and transient row tied to that match.</li>
+                <li><strong>Genre:</strong> real-time 1v1 competitive arcade (paddle and ball), in 3D</li>
+                <li><strong>Role:</strong> game design and development — Unity client and SpacetimeDB server module</li>
+                <li><strong>Tech:</strong> Unity 6 (C#, URP), SpacetimeDB (server-authoritative), SpacetimeAuth (OIDC with PKCE), DOTween, Cartoon FX Remaster particles</li>
+                <li><strong>Platforms:</strong> Windows and Android, with a web build planned</li>
+                <li><strong>Status:</strong> playable builds on both platforms, still being polished</li>
               </ul>
             </div>
 
             <div class="devlog-section">
-              <h4>Ranking: The Five-Division System</h4>
-              <p>Progression was designed as five divisions, each with its own win/loss point ranges and its own promotion threshold — explicitly modeled as data (<code>DivisionRuleRow</code>) rather than hardcoded branching logic, so balance changes are a SQL update, not a redeploy:</p>
+              <h4>The starting point</h4>
+              <p>This began as a question: what does it take to ship a real Unity multiplayer game on SpacetimeDB, a database that doubles as the game server? Tables are the persisted world state, and reducers — transactional, identity-authenticated functions — are the only way to change it, whether a player or the clock triggers them. After working through the official Blackholio tutorial, I designed an original game around that model.</p>
+            </div>
+
+            <div class="devlog-section">
+              <h4>What I built</h4>
+              <ul>
+                <li>Instant matchmaking within a player's own division, with a VS screen and 3-second countdowns</li>
+                <li>A ten-division ranking ladder with promotion and demotion, driven by a data table so balance changes need no redeploy</li>
+                <li>Coin rewards, a board shop (longer boards widen the real hit zone) and a powerup shop</li>
+                <li>Six powerups: Paddle Boost, Shrink Ray, Ghost Ball, Time Dilation, Piercing Shot and Guardian Shield</li>
+                <li>A one-time welcome gift for new players: 250 coins, 5 Paddle Boosts and 5 Ghost Balls, claimed from a popup after sign-in</li>
+                <li>Game feel: hit-point particles, camera shake, a rolling ball, powerup banners, pooled sound effects, a crossfading music playlist and player-adjustable music and effects volume</li>
+                <li>Email sign-in, so accounts and progress follow the player to any device</li>
+                <li>A post-match results panel with coins, rank change and promotion or demotion</li>
+              </ul>
+            </div>
+
+            <div class="devlog-section">
+              <h4>How it came together</h4>
+              <p><strong>The core loop.</strong> The server runs the ball at 20 ticks per second from a scheduled reducer; clients only send where their board is and render what the server says. Edge hits change the ball's angle. Every rally starts at the same base speed and accelerates until a point is scored — a tension curve inside each point instead of an artificial difficulty ramp between rounds.</p>
+              <p><strong>The match lifecycle.</strong> Each phase is driven by its own scheduled reducer: matchmaking, an 8-second PreMatch profile screen, a countdown before every rally, the physics tick, then match end — ranking, coins and cleanup of every timer and transient row. Disconnecting mid-match forfeits to the opponent through the same logic.</p>
+              <p><strong>Ranking.</strong> Ten divisions, each with its own point ranges and promotion threshold, stored as rows rather than branching code. Falling below the score that promoted you drops you back a tier, with division 1 as the floor.</p>
               <table class="devlog-table">
                 <thead>
                   <tr><th>Division</th><th>Promotes at</th><th>Win points</th><th>Loss points</th></tr>
@@ -673,61 +668,55 @@
                   <tr><td>2</td><td>1500</td><td>30–35</td><td>10–15</td></tr>
                   <tr><td>3</td><td>1700</td><td>20</td><td>10–15</td></tr>
                   <tr><td>4</td><td>2000</td><td>15</td><td>10–15</td></tr>
-                  <tr><td>5</td><td>— (top tier)</td><td>10</td><td>10–15</td></tr>
+                  <tr><td>5</td><td>2300</td><td>10</td><td>10–15</td></tr>
+                  <tr><td>6</td><td>2600</td><td>10</td><td>10–15</td></tr>
+                  <tr><td>7</td><td>2900</td><td>10</td><td>10–15</td></tr>
+                  <tr><td>8</td><td>3200</td><td>10</td><td>10–15</td></tr>
+                  <tr><td>9</td><td>3500</td><td>10</td><td>10–15</td></tr>
+                  <tr><td>10</td><td>— (top tier)</td><td>10</td><td>10–15</td></tr>
                 </tbody>
               </table>
-              <p>Demotion was added symmetrically later — falling back below the exact score that promoted you into your current division drops you back one tier, with division 1 acting as a floor.</p>
-              <p>A disconnect mid-match doesn't let you dodge the consequence either: the server detects an active match tied to the disconnecting player's identity and awards the win to whoever remained, running through the exact same ranking/coin logic as a natural match conclusion.</p>
+              <p>Growing from five divisions to ten was a data change, not a rewrite: new rule rows, one constant for the top tier, and a check on connect that fills in missing rows on an already-live database.</p>
+              <p><strong>Economy and powerups.</strong> Winning earns coins; coins buy boards and powerup charges. Timed powerups are applied and reverted by scheduled reducers, and the server computes each board's effective length so collision always matches what the player sees.</p>
+              <p><strong>Game feel.</strong> The server publishes small "flash" event rows (paddle hit, wall hit, point won) and the client turns them into particles, shake and sound at the exact hit position — no separate event protocol, just the same subscribe-and-react model as everything else.</p>
+              <p><strong>Accounts and mobile.</strong> Sign-in uses SpacetimeAuth with a PKCE flow: a local loopback listener on Windows and a custom URI scheme on Android. I tested real matches between a laptop and a phone. Input is an absolute-position slider — drag to place the paddle — sent on the same throttled tick as before.</p>
             </div>
 
             <div class="devlog-section">
-              <h4>The Economy: Coins and Paddles</h4>
-              <p>Winning matches pays out coins, spendable in a paddle shop offering boards of increasing length — a small progression loop layered on top of the ranking system. Paddle length isn't just cosmetic: it's read server-side at match creation and directly affects the actual collision boundary in <code>GameTick</code>, so a purchased upgrade has real gameplay weight, not just a visual difference.</p>
-            </div>
-
-            <div class="devlog-section">
-              <h4>Identity: Avatars and the VS Screen</h4>
-              <p>Every new player is randomly assigned one of ten avatars at registration. That single <code>avatar_id</code> integer flows everywhere identity needs to show up — the in-match scoreboard, the pre-match VS screen, the player's own profile panel — all resolved client-side through one shared lookup utility mapping the number to the correct image asset.</p>
-            </div>
-
-            <div class="devlog-section">
-              <h4>Making It Feel Good: Particles, Shake, and Motion</h4>
-              <p>Once the core loop worked, the focus shifted to feedback and feel:</p>
+              <h4>Challenges and how I solved them</h4>
               <ul>
-                <li><strong>Random hit particles</strong> — a pool of different "impact" text effects, one chosen at random and spawned at the exact server-reported collision point every time the ball connects with a paddle.</li>
-                <li><strong>Random win particles</strong> — a separate pool of fire effects, triggered at the losing end of the court, positioned using the ball's exact crossing point at the moment of scoring.</li>
-                <li><strong>Camera shake</strong> — a lightweight, ease-out positional shake layered onto both of the events above, subtle on a paddle hit, stronger on a round win.</li>
-                <li><strong>UI motion</strong> — the countdown panel and match-over banner both animate in and out with DOTween scale tweens (<code>OutBack</code>/<code>InBack</code> easing) rather than snapping instantly, giving key moments a bit of weight.</li>
+                <li><strong>Laggy controls on a hosted server.</strong> The paddle only moved after a full round trip. Fixes: client-side prediction for my own paddle (it moves instantly while the position is sent in the background) and interpolation with capped, velocity-based extrapolation for the opponent's. Later passes: the client predicts the ball between updates using the server's own motion rules, the server gives paddles a small hit tolerance to absorb latency, and a stale server update that could yank my slider backwards just after release is now ignored.</li>
+                <li><strong>Effects that only fired once.</strong> An event row deleted and re-inserted in one transaction reaches the client as an update, not an insert, so I subscribed to both. I also stopped deleting the point-won event during match-end cleanup, because a same-transaction delete cancelled the final point's effect.</li>
+                <li><strong>Silent failures from fire-and-forget calls.</strong> The UI assumed success while the server quietly rejected things like a taken username or too few coins. Per-reducer result callbacks now check commit or failure before the UI reacts.</li>
+                <li><strong>Collision that did not match the visuals.</strong> The ball sank into walls and edge hits missed. Court size, ball radius and wall and paddle margins became live server data; I measured the real mesh bounds in Unity and fed them back so physics and visuals share the same numbers.</li>
+                <li><strong>Native OAuth on two platforms.</strong> The provider rejected my custom redirect scheme, and desktop and mobile needed different ways to catch the redirect. The fix was a native (public) client, a reverse-domain URI scheme with an Android intent filter, and a loopback listener on Windows.</li>
+                <li><strong>Staying signed in.</strong> Players were asked to sign in repeatedly. The ID token lasts only 15 minutes and sign-in returned no refresh token, so I added the consent prompt that offline access requires. I also fixed bugs in my own session code: a refresh that overwrote the stored refresh token with an empty one, a dropped connection that wiped the saved session, and expiry read from the wrong field.</li>
+                <li><strong>Stale data after reconnecting.</strong> The first subscription replays old rows, so last session's match result and effects popped up again. The client now adopts only matches still in progress and scopes UI and effects to the active match.</li>
+                <li><strong>The blank-username collision.</strong> <code>username</code> was marked <code>[Unique]</code>, and every new, unregistered player was inserted with an empty username — so only the first ever unregistered connection could exist. Removing the database constraint and keeping the uniqueness check inside the register reducer fixed it.</li>
+                <li><strong>Tooling gotchas.</strong> Publishing from inside the Unity project picked up Unity's generated project files instead of the server module, so the module now lives in its own folder. Editing the module without re-running <code>spacetime generate</code> left Unity on a stale schema.</li>
               </ul>
             </div>
 
             <div class="devlog-section">
-              <h4>Input: Rethinking Control for Mobile</h4>
-              <p>Keyboard input (<code>Input.GetAxis("Horizontal")</code>) worked fine for early testing but didn't fit the eventual target of a touch-first game. It was replaced with a spring-back UI Slider — drag to move, release and it snaps back to center, functioning like a one-axis joystick. <code>PaddleController</code> reads the slider's current value on the same throttled send-tick it always used, so the underlying networking pattern didn't need to change at all — only where the input number came from.</p>
-            </div>
-
-            <div class="devlog-section">
-              <h4>The Debugging Trail</h4>
-              <p>A project like this accumulates a specific kind of debugging history, and a few of these were genuinely instructive:</p>
+              <h4>Smaller wins</h4>
               <ul>
-                <li><strong>Publishing from the wrong folder</strong> — an early and very common mistake: running <code>spacetime publish</code> from inside the Unity project itself picked up Unity's own generated <code>.csproj</code> files instead of the actual server module, causing a cryptic CLI panic. The fix was structural: the server module needs to live in a completely separate folder from the Unity project, never nested inside <code>Assets/</code>.</li>
-                <li><strong>Stale client bindings</strong> — several rounds of "reducer doesn't exist" errors traced back to editing the server module without re-running <code>spacetime generate</code> afterward. Publishing and generating are two separate steps, and skipping the second one silently leaves Unity working against an outdated schema.</li>
-                <li><strong>The <code>player_id</code> vs <code>identity</code> update bug</strong> — <code>Player.player_id</code> is <code>[Unique]</code>, not <code>[PrimaryKey]</code>; only the primary key column supports <code>.Update()</code>. A few reducers called <code>.player_id.Update(...)</code> out of habit, which doesn't compile — a good reminder that <code>Unique</code> and <code>PrimaryKey</code> aren't interchangeable even though both support lookups.</li>
-                <li><strong>The blank-username collision</strong> — the single most subtle bug in the whole project. <code>Player.username</code> was originally marked <code>[Unique]</code>, and every newly connected, not-yet-registered player got inserted with <code>username = ""</code>. Since a unique constraint applies globally, only the first ever unregistered connection could hold that value — every subsequent fresh identity got flatly rejected at the connection layer with "value already exists," even though nothing was actually wrong with their registration. The fix was removing the database-level constraint entirely and relying on the manual uniqueness check already present inside the <code>RegisterPlayer</code> reducer, which only needs to apply to genuinely chosen usernames, not the shared placeholder default.</li>
-                <li><strong>Silent reducer failures</strong> — a recurring lesson: calling a reducer from the C# client SDK is fire-and-forget. A <code>try/catch</code> around the call site catches connection-level failures, but never a server-side rejection (insufficient coins, duplicate username, and so on). The correct pattern is subscribing to that reducer's specific event callback and checking <code>ctx.Event.Status</code> for <code>Committed</code> versus <code>Failed</code>. Several UI scripts were quietly assuming success and updating regardless of what the server actually did, until this was corrected.</li>
-                <li><strong>Court scale mismatches</strong> — the gameplay bounds (<code>CourtConfig.court_width</code>/<code>court_length</code>) and the actual visual arena asset drifted out of sync more than once: walls repositioning to the wrong spot, paddles ending up off the real playing surface, a custom floor mesh getting incorrectly rescaled based on a "default 10-unit plane" assumption that didn't apply to a bespoke asset. The fix each time came back to the same principle — treat the server's court dimensions as the single source of truth for both rendering and physics, and measure the actual asset's real-world bounds rather than guessing.</li>
+                <li>Pooled audio sources, so overlapping sounds don't bleed pitch into each other</li>
+                <li>Named event handlers that unsubscribe cleanly, so reopening a panel doesn't stack duplicate listeners</li>
+                <li>Tunable values (speeds, prices, divisions) kept in data instead of code</li>
+                <li>A cut feature: I tried random floating powerup pickups on the court and removed them again to keep powerups something players choose rather than stumble into</li>
               </ul>
             </div>
 
             <div class="devlog-section">
-              <h4>Reflections</h4>
+              <h4>What I learned</h4>
               <ul>
-                <li><strong>Data-driven rules beat hardcoded branches.</strong> The division system, court dimensions, and paddle catalog all live in tables specifically so they can be tuned with a SQL statement instead of a redeploy.</li>
-                <li><strong>Every visual moment worth reacting to can be a table row.</strong> Particles and camera shake didn't need a custom event system — they needed one small, frequently-overwritten table each.</li>
-                <li><strong>Fire-and-forget reducer calls demand explicit result handling.</strong> Assuming success is the single easiest mistake to make when moving from a traditional request/response API mindset into SpacetimeDB's model.</li>
-                <li><strong>Match the server's gameplay math to the client's actual geometry, always.</strong> Any hardcoded assumption about scale, on either side, is a bug waiting to surface the moment the art doesn't match the placeholder.</li>
+                <li>Design for server authority first, then hide latency on the client.</li>
+                <li>Think about how transactions coalesce changes before trusting an event stream.</li>
+                <li>Keep tunables in data so balancing is a database edit.</li>
+                <li>Measure real assets instead of assuming their sizes.</li>
+                <li>Persistent login is its own feature: token lifetimes, refresh and failure handling all need designing.</li>
               </ul>
-              <p>BoardBlast is still growing — the paddle shop, division ladder, and presentation layer are all in place, with room ahead for deeper progression systems and a real cross-device login bridge once the core game loop is fully proven out.</p>
+              <p>Next up: a app release and in-app coin packs.</p>
             </div>
 
             <p class="devlog-gallery-label">More from the build</p>
